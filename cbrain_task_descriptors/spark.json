@@ -9,7 +9,7 @@
     "description": "SParsity-based Analysis of Reliable K-hubness (SPARK) for brain fMRI functional connectivity",
     "container-image": {
         "type": "singularity",
-        "image": "multifunkimlab/spark:1.2.2"
+        "image": "multifunkimlab/spark:1.2.1"
     },
     "command-line": "octave --no-gui --no-init-file -q $SPARK_ROOT/SPARK.m [FMRI_DATA] [MASK] [OUT_DIR] [NB_RESAMPLING] [NETWORK_SCALES] [NB_ITERATIONS] [P_VALUE] [RESAMPLING_METHOD] [BLOCK_WINDOW_LENGTH] [DICT_INIT_METHOD] [SPARSE_CODING_METHOD] [PRESERVE_DC_ATOM] [MAX_PARALLEL_JOBS]",
 
@@ -58,7 +58,6 @@
             "description": "The fMRI data to analyze. (file formats: MINC, NIfTI)",
             "type": "File",
             "optional": false,
-
             "command-line-flag": "--fmri-data",
             "value-key": "[FMRI_DATA]"
         },
@@ -228,7 +227,5 @@
         "cpu-cores": 2,
         "ram": 12,
         "walltime-estimate": 100000
-    },
-
-
+    }
 }
