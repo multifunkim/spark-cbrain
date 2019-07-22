@@ -67,7 +67,8 @@
         }, 
         {
             "command-line-flag": "--nb-resampling", 
-            "description": "Number of bootstrap resampling at the individual level. (recommended: 100)", 
+            "description": "Number of bootstrap resampling at the individual level. (recommended: 100)",
+            "default-value": 100,
             "id": "nb_resampling", 
             "integer": true, 
             "minimum": 2, 
@@ -78,7 +79,12 @@
         }, 
         {
             "command-line-flag": "--network-scales", 
-            "description": "Three numbers, respectively: [begin] [step] [end], used to create a regularly-spaced vector. In order to specify a single number, for instance '15', enter the same number for [begin] and [end], as: 15 1 15. This vector of numbers corresponds to the range of network scales to be tested. An optimal network scale is estimated from the specified set of numbers. (recommended: 10 2 30)", 
+            "description": "Three numbers, respectively: [begin] [step] [end], used to create a regularly-spaced vector. In order to specify a single number, for instance '15', enter the same number for [begin] and [end], as: 15 1 15. This vector of numbers corresponds to the range of network scales to be tested. An optimal network scale is estimated from the specified set of numbers. (recommended: 10 2 30)",
+            "default-value": [
+                10,
+                2,
+                30
+            ],
             "id": "network_scales", 
             "integer": true, 
             "list": true, 
@@ -92,7 +98,8 @@
         }, 
         {
             "command-line-flag": "--nb-iterations", 
-            "description": "Number of iterations for the sparse dictionary learning.  (recommended: 20)", 
+            "description": "Number of iterations for the sparse dictionary learning.  (recommended: 20)",
+            "default-value": 20,
             "id": "nb_iterations", 
             "integer": true, 
             "minimum": 2, 
@@ -102,7 +109,8 @@
             "value-key": "[NB_ITERATIONS]"
         }, 
         {
-            "command-line-flag": "--p-value", 
+            "command-line-flag": "--p-value",
+            "default-value": 0.01,
             "description": "Significance level, using a Z-test, for removing inconsistent elements in the average sparse coefficients (considered as the Gaussian noise) after spatial clustering (using a threshold).", 
             "id": "p_value", 
             "maximum": 1, 
@@ -150,9 +158,9 @@
                 1, 
                 30
             ], 
-            "description": "Three numbers, respectively: [begin] [step] [end], used to create a regularly-spaced vector. In order to specify a single number, for instance '15', enter the same number for [begin] and [end], as: 15 1 15. A number in this vector corresponds to a window length used in the circular block bootstrap. The unit of the window length is \u2018time-point\u2019 with each time-point indicating a 3D scan at each TR. If multiple numbers are specified, then a number is randomly selected from the list at each resampling. It is recommended to use a minimum of sqrt(T), where T is the total number of time points in the fMRI time-course. It is also recommended to randomize the window length to reduce a bias by window size.", 
+            "description": "Three numbers, respectively: [begin] [step] [end], used to create a regularly-spaced vector. In order to specify a single number, for instance '15', enter the same number for [begin] and [end], as: 15 1 15. A number in this vector corresponds to a window length used in the circular block bootstrap. The unit of the window length is \u2018time-point\u2019 with each time-point indicating a 3D scan at each TR. If multiple numbers are specified, then a number is randomly selected from the list at each resampling. It is recommended to use a minimum of sqrt(T), where T is the total number of time points in the fMRI time-course. It is also recommended to randomize the window length to reduce a bias by window size.",
             "id": "block_window_length", 
-            "integer": true, 
+            "integer": true,
             "list": true, 
             "max-list-entries": 3, 
             "min-list-entries": 3, 
