@@ -1,0 +1,12 @@
+brick/spark_run_fmri_Gx_clustering.m
+brick/spark_run_fmri_kmap.m
+brick/spark_run_fmri_kmdl.m
+brick/spark_run_fmri_single_kmap.m
+brick/spark_run_fmri_tseries_boot.m
+function/MPF.m
+function/spark_KSVD.m
+function/spark_MDL.m
+function/spark_vKSVD.m
+function/spark_vMDL.m
+pipeline/spark_pipeline_fmri_kmap.m
+pipeline/spark_pipeline_fmri_kmap_ind.m
