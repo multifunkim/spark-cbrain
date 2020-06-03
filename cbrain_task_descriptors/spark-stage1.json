@@ -1,0 +1,238 @@
+{
+    "name": "spark",
+    "author": "Multi FunkIm",
+    "command-line": "spark --SETUP [FMRI] [OUT_DIR] [MASK] [NB_RESAMPLINGS] [NETWORK_SCALES] [NB_ITERATIONS] [P_VALUE] [RESAMPLING_METHOD] [BLOCK_WINDOW_LENGTH] [DICT_INIT_METHOD] [SPARSE_CODING_METHOD] [PRESERVE_DC_ATOM] [VERBOSE] && spark --RUN --stage A [FMRI] [OUT_DIR] [VERBOSE]",
+    "container-image": {
+        "image": "multifunkim/spark-matlab",
+        "type": "docker"
+    },
+    "description": "SParsity-based Analysis of Reliable K-hubness (SPARK) for brain fMRI functional connectivity",
+    "groups": [
+        {
+            "id": "bootstrap_resampling",
+            "members": [
+                "nb_resamplings",
+                "resampling_method",
+                "block_window_length"
+            ],
+            "name": "Bootstrap resampling"
+        },
+        {
+            "id": "sparse_dict_learning",
+            "members": [
+                "network_scales",
+                "nb_iterations",
+                "dict_init_method",
+                "sparse_coding_method",
+                "preserve_dc_atom"
+            ],
+            "name": "Sparse dictionary learning"
+        },
+        {
+            "id": "k_hubness_map_generation",
+            "members": [
+                "p_value"
+            ],
+            "name": "k-hubness map generation"
+        }
+    ],
+    "inputs": [
+        {
+            "command-line-flag": "--fmri",
+            "description": "Path (absolute or relative) to the fMRI data to analyze. Notes: - This file should be a valid fMRI file of a BIDS dataset. - The filename will be used to name the outputs, for example: 'kmap_sub-01_task-rest_bold.mat'.",
+            "id": "fmri",
+            "name": "fMRI data",
+            "optional": false,
+            "type": "File",
+            "value-key": "[FMRI]"
+        },
+        {
+            "command-line-flag": "--out-dir",
+            "description": "Path (absolute or relative) to the output directory (old files might get replaced). By default, a new directory named after the specified input --fmri is created relative this output directory --out-dir to avoid conflicts. To change this default setting, use --move-outputs (useful to merge results of multiple analyses).",
+            "id": "out_dir",
+            "name": "Output directory name",
+            "optional": false,
+            "type": "String",
+            "value-key": "[OUT_DIR]"
+        },
+        {
+            "command-line-flag": "--mask",
+            "description": "Path (absolute or relative) to the grey-matter mask. (file formats: MINC, NIfTI)",
+            "id": "mask",
+            "name": "Grey-matter mask",
+            "optional": false,
+            "type": "File",
+            "value-key": "[MASK]"
+        },
+        {
+            "command-line-flag": "--nb-resamplings",
+            "description": "Number of bootstrap resamplings at the individual level. (recommended: 100)",
+            "default-value": 100,
+            "id": "nb_resamplings",
+            "integer": true,
+            "minimum": 2,
+            "name": "Number of resamplings",
+            "optional": false,
+            "type": "Number",
+            "value-key": "[NB_RESAMPLINGS]"
+        },
+        {
+            "command-line-flag": "--network-scales",
+            "description": "Three integers, respectively: [begin] [step] [end], used to create a regularly-spaced vector. In order to specify a single number, for instance '12', enter the same number for [begin] and [end], as: '--network-scales 12 1 12'. The numbers in the vector correspond to the range of network scales to be tested. An optimal network scale will be automatically estimated from the vector. (recommended: 10 2 30)",
+            "default-value": [
+                10,
+                2,
+                30
+            ],
+            "id": "network_scales",
+            "integer": true,
+            "list": true,
+            "max-list-entries": 3,
+            "min-list-entries": 3,
+            "minimum": 1,
+            "name": "Network scales",
+            "optional": false,
+            "type": "Number",
+            "value-key": "[NETWORK_SCALES]"
+        },
+        {
+            "command-line-flag": "--nb-iterations",
+            "description": "Number of iterations for the sparse dictionary learning.  (recommended: 20)",
+            "default-value": 20,
+            "id": "nb_iterations",
+            "integer": true,
+            "minimum": 2,
+            "name": "Number of iterations",
+            "optional": false,
+            "type": "Number",
+            "value-key": "[NB_ITERATIONS]"
+        },
+        {
+            "command-line-flag": "--p-value",
+            "default-value": 0.05,
+            "description": "Significance level, using a Z-test, for removing inconsistent elements in the average sparse coefficients (considered as Gaussian noise) after spatial clustering.",
+            "id": "p_value",
+            "maximum": 1,
+            "minimum": 0,
+            "name": "P-Value",
+            "optional": false,
+            "type": "Number",
+            "value-key": "[P_VALUE]"
+        },
+        {
+            "command-line-flag": "--resampling-method",
+            "default-value": "CBB",
+            "description": "Method (from NIAK) used to resample the data under the null hypothesis. Note: If 'CBB' is selected, the option --block-window-length is used. - CBB: Circular-block-bootstrap sample of multiple time series. - AR1B: Bootstrap sample of multiple time series based on a semiparametric scheme mixing an auto-regressive temporal model and i.i.d. bootstrap of the 'innovations'. - AR1G: Bootstrap sample of multiple time series based on a parametric model of Gaussian data with arbitrary spatial correlations and first-order auto-regressive temporal correlations.",
+            "id": "resampling_method",
+            "name": "Resampling method",
+            "optional": true,
+            "type": "String",
+            "value-choices": [
+                "CBB",
+                "AR1B",
+                "AR1G"
+            ],
+            "value-disables": {
+                "AR1B": [
+                    "block_window_length"
+                ],
+                "AR1G": [
+                    "block_window_length"
+                ],
+                "CBB": []
+            },
+            "value-key": "[RESAMPLING_METHOD]",
+            "value-requires": {
+                "AR1B": [],
+                "AR1G": [],
+                "CBB": [
+                    "block_window_length"
+                ]
+            }
+        },
+        {
+            "command-line-flag": "--block-window-length",
+            "default-value": [
+                10,
+                1,
+                30
+            ],
+            "description": "Three numbers, respectively: [begin] [step] [end], used to create a regularly-spaced vector. In order to specify a single number, for instance '12', enter the same number for [begin] and [end], as: '--block-window-length 12 1 12'. A number in the vector corresponds to a window length used in the circular block bootstrap. The unit of the window length is ‘time-point’ with each time-point indicating a 3D scan at each TR. If the vector contains multiple numbers, then a number will be randomly selected from it at each resampling. It is recommended to use window lengths greater or equal to sqrt(T), where T is the total number of time points in the fMRI time-course. It is also recommended to randomize the window length used at each resampling to reduce a bias by window size.",
+            "id": "block_window_length",
+            "integer": true,
+            "list": true,
+            "max-list-entries": 3,
+            "min-list-entries": 3,
+            "minimum": 1,
+            "name": "Block window length",
+            "optional": true,
+            "type": "Number",
+            "value-key": "[BLOCK_WINDOW_LENGTH]"
+        },
+        {
+            "command-line-flag": "--dict-init-method",
+            "default-value": "GivenMatrix",
+            "description": "If 'GivenMatrix' is selected, then the dictionary will be initialized by a random permutation of the raw data obtained in step 1. If 'DataElements' is selected, then the dictionary will be initialized by the first N (number of atoms) columns in the raw data obtained in step 1.",
+            "id": "dict_init_method",
+            "name": "Dictionary initialization method",
+            "optional": true,
+            "type": "String",
+            "value-choices": [
+                "GivenMatrix",
+                "DataElements"
+            ],
+            "value-key": "[DICT_INIT_METHOD]"
+        },
+        {
+            "command-line-flag": "--sparse-coding-method",
+            "default-value": "Thresholding",
+            "description": "Sparse coding method for the sparse dictionary learning.",
+            "id": "sparse_coding_method",
+            "name": "Sparse coding method",
+            "optional": true,
+            "type": "String",
+            "value-choices": [
+                "OMP",
+                "Thresholding"
+            ],
+            "value-key": "[SPARSE_CODING_METHOD]"
+        },
+        {
+            "command-line-flag": "--preserve-dc-atom",
+            "description": "If set, then the first atom will be set to a constant and will never change, while all the other atoms will be trained and updated.",
+            "id": "preserve_dc_atom",
+            "name": "Perserve DC atom",
+            "optional": true,
+            "type": "Flag",
+            "value-key": "[PRESERVE_DC_ATOM]"
+        },
+        {
+            "command-line-flag": "--verbose",
+            "description": "If set, the program will provide some additional details.",
+            "id": "verbose",
+            "name": "Verbose",
+            "optional": true,
+            "type": "Flag",
+            "value-key": "[VERBOSE]"
+        }
+    ],
+    "output-files": [
+        {
+            "description": "Results directory containing:  k-hubness maps, atom maps and intermediate files. (file formats: MINC, NIfTI)",
+            "id": "result",
+            "name": "Results directory",
+            "optional": false,
+            "path-template": "[OUT_DIR]"
+        }
+    ],
+    "schema-version": "0.5",
+    "suggested-resources": {
+        "cpu-cores": 2,
+        "ram": 12,
+        "walltime-estimate": 100000
+    },
+    "tags": {
+            "domain": [ "neuroinformatics", "fmri", "neuroimaging"]
+    },
+    "tool-version": "v1.2.1"
+}
