@@ -1,0 +1,67 @@
+{
+    "name": "spark",
+    "author": "Multi FunkIm",
+    "command-line": "spark --RUN --stage C [FMRI] [OUT-DIR] [VERBOSE] && spark --WRAP-UP [FMRI] [OUT-DIR] [MOVE-OUTPUTS] [VERBOSE]",
+    "container-image": {
+        "image": "multifunkim/spark-matlab",
+        "type": "docker"
+    },
+    "description": "SParsity-based Analysis of Reliable K-hubness (SPARK) for brain fMRI functional connectivity",
+    "inputs": [
+        {
+            "command-line-flag": "--fmri",
+            "description": "Path (absolute or relative) to the fMRI data to analyze. Notes: - This file should be a valid fMRI file of a BIDS dataset. - The filename will be used to name the outputs, for example: 'kmap_sub-01_task-rest_bold.mat'.",
+            "id": "fmri",
+            "name": "fMRI data",
+            "optional": false,
+            "type": "File",
+            "value-key": "[FMRI]"
+        },
+        {
+            "command-line-flag": "--out-dir",
+            "description": "Path (absolute or relative) to the output directory (old files might get replaced). By default, a new directory named after the specified input --fmri is created relative this output directory --out-dir to avoid conflicts. To change this default setting, use --move-outputs (useful to merge results of multiple analyses).",
+            "id": "out_dir",
+            "name": "Output directory name",
+            "optional": false,
+            "type": "File",
+            "value-key": "[OUT_DIR]"
+        },
+        {
+            "command-line-flag": "--verbose",
+            "description": "If set, the program will provide some additional details.",
+            "id": "verbose",
+            "name": "Verbose",
+            "optional": true,
+            "type": "Flag",
+            "value-key": "[VERBOSE]"
+        },
+        {
+            "command-line-flag": "--move-outputs",
+            "description": "If set, all outputs for this analysis will be moved to the specified output directory --out-dir. This flag is useful to merge in a single directory the results of different analyses where the input fMRI were different.",
+            "id": "move_outputs",
+            "name": "Move output files",
+            "optional": true,
+            "type": "Flag",
+            "value-key": "[MOVE-OUTPUTS]"
+        }
+    ],
+    "output-files": [
+        {
+            "description": "Results directory containing:  k-hubness maps, atom maps and intermediate files. (file formats: MINC, NIfTI)",
+            "id": "result",
+            "name": "Results directory",
+            "optional": false,
+            "path-template": "[OUT_DIR]"
+        }
+    ],
+    "schema-version": "0.5",
+    "suggested-resources": {
+        "cpu-cores": 2,
+        "ram": 12,
+        "walltime-estimate": 100000
+    },
+    "tags": {
+        "domain": [ "neuroinformatics", "fmri", "neuroimaging"]
+    },
+    "tool-version": "v1.2.1"
+}
