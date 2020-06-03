@@ -1,7 +1,7 @@
 {
     "name": "spark",
     "author": "Multi FunkIm",
-    "command-line": "spark --RUN --stage B [FMRI] [OUT-DIR] [VERBOSE] boot[JOBS-PATTERNS]_",
+    "command-line": "spark --RUN --stage B [FMRI] [OUT_DIR] [VERBOSE] boot[JOBS-PATTERNS]_",
     "container-image": {
         "image": "multifunkim/spark-matlab",
         "type": "docker"
