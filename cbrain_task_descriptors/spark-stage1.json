@@ -1,5 +1,5 @@
 {
-    "name": "spark",
+    "name": "spark parallel (stage 1 of 3)",
     "author": "Multi FunkIm",
     "command-line": "spark --SETUP [FMRI] [OUT_DIR] [MASK] [NB_RESAMPLINGS] [NETWORK_SCALES] [NB_ITERATIONS] [P_VALUE] [RESAMPLING_METHOD] [BLOCK_WINDOW_LENGTH] [DICT_INIT_METHOD] [SPARSE_CODING_METHOD] [PRESERVE_DC_ATOM] [VERBOSE] && spark --RUN --stage A [FMRI] [OUT_DIR] [VERBOSE]",
     "container-image": {
@@ -157,7 +157,7 @@
                 1,
                 30
             ],
-            "description": "Three numbers, respectively: [begin] [step] [end], used to create a regularly-spaced vector. In order to specify a single number, for instance '12', enter the same number for [begin] and [end], as: '--block-window-length 12 1 12'. A number in the vector corresponds to a window length used in the circular block bootstrap. The unit of the window length is ‘time-point’ with each time-point indicating a 3D scan at each TR. If the vector contains multiple numbers, then a number will be randomly selected from it at each resampling. It is recommended to use window lengths greater or equal to sqrt(T), where T is the total number of time points in the fMRI time-course. It is also recommended to randomize the window length used at each resampling to reduce a bias by window size.",
+            "description": "Three numbers, respectively: [begin] [step] [end], used to create a regularly-spaced vector. In order to specify a single number, for instance '12', enter the same number for [begin] and [end], as: '--block-window-length 12 1 12'. A number in the vector corresponds to a window length used in the circular block bootstrap. The unit of the window length is \u2018time-point\u2019 with each time-point indicating a 3D scan at each TR. If the vector contains multiple numbers, then a number will be randomly selected from it at each resampling. It is recommended to use window lengths greater or equal to sqrt(T), where T is the total number of time points in the fMRI time-course. It is also recommended to randomize the window length used at each resampling to reduce a bias by window size.",
             "id": "block_window_length",
             "integer": true,
             "list": true,
@@ -232,7 +232,12 @@
         "walltime-estimate": 100000
     },
     "tags": {
-            "domain": [ "neuroinformatics", "fmri", "neuroimaging"]
+        "domain": [
+            "neuroinformatics",
+            "fmri",
+            "neuroimaging"
+        ]
     },
-    "tool-version": "v1.2.1"
+    "tool-version": "v1.2.1",
+    "doi": "10.5281/zenodo.3873804"
 }

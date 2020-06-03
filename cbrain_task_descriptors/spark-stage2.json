@@ -1,5 +1,5 @@
 {
-    "name": "spark",
+    "name": "spark parallel (stage 2 of 3)",
     "author": "Multi FunkIm",
     "command-line": "spark --RUN --stage B [FMRI] [OUT_DIR] [VERBOSE] boot[JOBS-PATTERNS]_",
     "container-image": {
@@ -62,7 +62,12 @@
         "walltime-estimate": 100000
     },
     "tags": {
-        "domain": [ "neuroinformatics", "fmri", "neuroimaging"]
+        "domain": [
+            "neuroinformatics",
+            "fmri",
+            "neuroimaging"
+        ]
     },
-    "tool-version": "v1.2.1"
+    "tool-version": "v1.2.1",
+    "doi": "10.5281/zenodo.3873806"
 }
