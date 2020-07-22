@@ -23,7 +23,7 @@
             "id": "out_dir",
             "name": "Output directory name",
             "optional": false,
-            "type": "File",
+            "type": "String",
             "value-key": "[OUT_DIR]"
         },
         {
@@ -66,6 +66,9 @@
             "fmri",
             "neuroimaging"
         ]
+    },
+    "custom": {
+        "cbrain:inherits-from-class": "CbrainTask::SparkHandler"
     },
     "tool-version": "v1.2.1",
     "doi": "10.5281/zenodo.3873808"

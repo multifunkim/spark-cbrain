@@ -238,6 +238,9 @@
             "neuroimaging"
         ]
     },
+    "custom": {
+        "cbrain:inherits-from-class": "CbrainTask::SparkHandler"
+    },
     "tool-version": "v1.2.1",
     "doi": "10.5281/zenodo.3873804"
 }
