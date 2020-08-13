@@ -200,7 +200,11 @@ else
 end
 
 names = fieldnames(pipe);
-names(~contains(names, jobs_patterns)) = [];
+if endsWith(jobs_patterns, ';')
+    names = names(str2num(jobs_patterns)); %#ok
+else
+    names(~contains(names, jobs_patterns)) = [];
+end
 for k = 1 : size(names, 1)
     name = names{k};
     files_in = pipe.(name).files_in; %#ok

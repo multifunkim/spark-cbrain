@@ -22,9 +22,14 @@ def run_pipe(iargs):
     """Runs a SPARK sub-pipeline.
     """
 
-    jobs_pattern = ' '.join([quote(s) for s in iargs['jobs_pattern']])
+    jobs_patterns = ''
+    if iargs['jobs_indices']:
+        jobs_patterns = ';'.join([str(x) for x in iargs['jobs_indices']]) + ';'
+    if iargs['jobs_patterns']:
+        jobs_patterns = ' '.join([quote(s) for s in iargs['jobs_patterns']])
+
     cmd = '{} run {} {} {}'.format(
-        quote(iargs['exe']), quote(iargs['pipe_file']), iargs['stage'], jobs_pattern)
+        quote(iargs['exe']), quote(iargs['pipe_file']), iargs['stage'], jobs_patterns)
     p = sp_run(cmd, shell=True, cwd=iargs['out_dir'])
     if p.returncode != 0:
         print('\n\nThe process returned a non-zero exit status:\n' +
@@ -48,6 +53,12 @@ def check_iargs_integrity(iargs):
     if not os.path.isfile(iargs['pipe_file']):
         print('Pipeline file not found:\n' + iargs['pipe_file'], file=stderr)
         sys_exit(1)
+
+    # Jobs indices
+    if iargs['jobs_indices'] and any(x < 1 for x in iargs['jobs_indices']):
+        print('--jobs-indices\n' +
+              'One of the elements is smaller than 1:\n' + str(iargs['jobs_indices']), file=stderr)
+        sys_exit(1):
 
     return None
 
@@ -185,17 +196,34 @@ def check_iargs_parser(iargs):
                           ____________________________________________________________
                           '''))
     optional.add_argument('--jobs-patterns', nargs='+', type=str,
-                          default='',
+                          default=[],
                           help=dedent('''\
                           For expert users. Used to filter the jobs of interest in the
-                          chosen pipeline. All jobs are run by default.
+                          chosen pipeline using strings. All jobs are run by default.
+                          If --jobs-patterns and --jobs-indices are both specified,
+                          then --jobs-patterns takes precedence.
                            
                           (default: %(default)s)
                           (type: %(type)s)
                           ____________________________________________________________
                           '''),
                           metavar=('X'),
-                          dest='jobs_pattern')
+                          dest='jobs_patterns')
+    optional.add_argument('--jobs-indices', nargs='+', type=int,
+                          default=[],
+                          help=dedent('''\
+                          For expert users. Used to filter the jobs of interest in the
+                          chosen pipeline using integers. All jobs are run by default.
+                          If --jobs-indices and --jobs-patterns are both specified,
+                          then --jobs-patterns takes precedence.
+                           
+                          (valid values: %(metavar)s>=1)
+                          (default: %(default)s)
+                          (type: %(type)s)
+                          ____________________________________________________________
+                          '''),
+                          metavar=('X'),
+                          dest='jobs_indices')
     optional.add_argument('-v', '--verbose',
                           action='store_true',
                           help=dedent('''\
