@@ -1,5 +1,5 @@
-    {
+{
     "fmri": "sub-1_task-rest_bold.nii",
     "out_dir": "results",
-    "jobs_patterns": 1
+    "jobs_indices": [1]
 }

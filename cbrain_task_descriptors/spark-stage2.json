@@ -1,7 +1,7 @@
 {
-    "name": "spark parallel (stage 2 of 3)",
+    "name": "SPARK (stage 2 of 3)",
     "author": "Multi FunkIm",
-    "command-line": "spark --RUN --stage B [FMRI] [OUT_DIR] [VERBOSE] boot[JOBS-PATTERNS]_",
+    "command-line": "spark --RUN --stage B [FMRI] [OUT_DIR] [VERBOSE] [JOBS-INDICES]",
     "container-image": {
         "image": "multifunkim/spark-matlab",
         "type": "docker"
@@ -36,14 +36,17 @@
             "value-key": "[VERBOSE]"
         },
         {
-            "description": "Job number to run. Must be lower or equal to nb_resamplings used during setup.",
-            "id": "jobs_patterns",
-            "name": "Jobs patterns",
+            "command-line-flag": "--jobs-indices",
+            "description": "Jobs indices to run. Must be lower or equal to nb_resamplings used during setup.",
+            "id": "jobs_indices",
+            "name": "Jobs indices",
             "optional": false,
             "type": "Number",
             "integer": true,
-            "maximum": 100,
-            "value-key": "[JOBS-PATTERNS]"
+            "list": true,
+            "min-list-entries": 1,
+            "minimum": 1,
+            "value-key": "[JOBS-INDICES]"
         }
     ],
     "output-files": [
@@ -57,8 +60,8 @@
     ],
     "schema-version": "0.5",
     "suggested-resources": {
-        "cpu-cores": 2,
-        "ram": 12,
+        "cpu-cores": 1,
+        "ram": 8,
         "walltime-estimate": 100000
     },
     "tags": {
@@ -71,6 +74,6 @@
     "custom": {
         "cbrain:inherits-from-class": "CbrainTask::SparkHandler"
     },
-    "tool-version": "v1.2.1",
-    "doi": "10.5281/zenodo.3873806"
+    "tool-version": "v1.2.2",
+    "doi": "10.5281/zenodo.3984184"
 }

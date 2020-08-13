@@ -1,5 +1,5 @@
 {
-    "name": "spark parallel (stage 1 of 3)",
+    "name": "SPARK (stage 1 of 3)",
     "author": "Multi FunkIm",
     "command-line": "spark --SETUP [FMRI] [OUT_DIR] [MASK] [NB_RESAMPLINGS] [NETWORK_SCALES] [NB_ITERATIONS] [P_VALUE] [RESAMPLING_METHOD] [BLOCK_WINDOW_LENGTH] [DICT_INIT_METHOD] [SPARSE_CODING_METHOD] [PRESERVE_DC_ATOM] [VERBOSE] && spark --RUN --stage A [FMRI] [OUT_DIR] [VERBOSE]",
     "container-image": {
@@ -227,8 +227,8 @@
     ],
     "schema-version": "0.5",
     "suggested-resources": {
-        "cpu-cores": 2,
-        "ram": 12,
+        "cpu-cores": 1,
+        "ram": 8,
         "walltime-estimate": 100000
     },
     "tags": {
@@ -241,6 +241,6 @@
     "custom": {
         "cbrain:inherits-from-class": "CbrainTask::SparkHandler"
     },
-    "tool-version": "v1.2.1",
-    "doi": "10.5281/zenodo.3873804"
+    "tool-version": "v1.2.2",
+    "doi": "10.5281/zenodo.3984182"
 }
