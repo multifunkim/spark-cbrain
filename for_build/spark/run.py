@@ -58,7 +58,7 @@ def check_iargs_integrity(iargs):
     if iargs['jobs_indices'] and any(x < 1 for x in iargs['jobs_indices']):
         print('--jobs-indices\n' +
               'One of the elements is smaller than 1:\n' + str(iargs['jobs_indices']), file=stderr)
-        sys_exit(1):
+        sys_exit(1)
 
     return None
 
