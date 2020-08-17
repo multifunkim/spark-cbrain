@@ -56,7 +56,7 @@ class CbrainTask::SparkHandler < PortalTask
   end
 
   def create_stage1_task #:nodoc:
-    stage1 = CbrainTask::Sparkparallelstage1of3.new
+    stage1 = CbrainTask::SPARKstage1of3.new
     stage1.user_id          = self.user_id
     stage1.bourreau_id      = self.bourreau_id
     stage1.group_id         = self.group_id
@@ -75,7 +75,7 @@ class CbrainTask::SparkHandler < PortalTask
 
     nb_resamplings = params[:nb_resamplings]
     
-    stage2_tool_id = Tool.where(:cbrain_task_class_name => CbrainTask::Sparkparallelstage2of3).first.id
+    stage2_tool_id = Tool.where(:cbrain_task_class_name => CbrainTask::SPARKstage2of3).first.id
     if !stage2_tool_id
       self.addlog "No tool for Spark stage 2 found."
       return []
@@ -88,8 +88,8 @@ class CbrainTask::SparkHandler < PortalTask
       return []
     end
 
-    for job_patterns in (0..nb_resamplings) do
-      stage2 = CbrainTask::Sparkparallelstage2of3.new
+    for job_index in (1..nb_resamplings) do
+      stage2 = CbrainTask::SPARKstage2of3.new
       stage2.user_id          = self.user_id
       stage2.bourreau_id      = self.bourreau_id
       stage2.group_id         = self.group_id
@@ -98,7 +98,7 @@ class CbrainTask::SparkHandler < PortalTask
 
       # Change params.
       stage2.params                 = params
-      stage2.params[:jobs_patterns] = job_patterns
+      stage2.params[:jobs_indices]  = job_index
       stage2.params[:stage]         = 2
       stage2.params[:out_dir]       = stage1.params[:out_dir]
 
@@ -115,9 +115,9 @@ class CbrainTask::SparkHandler < PortalTask
 
   def create_stage3_task(stage2_tasks) #:nodoc:
     stage2 = stage2_tasks.first
-    stage3 = CbrainTask::Sparkparallelstage3of3.new
+    stage3 = CbrainTask::SPARKstage3of3.new
 
-    stage3_tool_id = Tool.where(:cbrain_task_class_name => CbrainTask::Sparkparallelstage3of3).first.id
+    stage3_tool_id = Tool.where(:cbrain_task_class_name => CbrainTask::SPARKstage3of3).first.id
     if !stage3_tool_id
       self.addlog "No tool for Spark stage 3 found."
       return []
@@ -130,7 +130,7 @@ class CbrainTask::SparkHandler < PortalTask
       return []
     end
 
-    stage3 = CbrainTask::Sparkparallelstage3of3.new
+    stage3 = CbrainTask::SPARKstage3of3.new
     stage3.user_id          = self.user_id
     stage3.bourreau_id      = self.bourreau_id
     stage3.group_id         = self.group_id
