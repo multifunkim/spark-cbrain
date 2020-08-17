@@ -63,7 +63,6 @@ class CbrainTask::SparkHandler < PortalTask
     stage1.tool_config_id   = self.tool_config_id
     stage1.status           = 'New'
     stage1.params           = params
-    stage1.params[:stage]   = 1
     stage1.params[:out_dir] = params[:out_dir] + self.run_id
 
     stage1.save!
@@ -99,7 +98,6 @@ class CbrainTask::SparkHandler < PortalTask
       # Change params.
       stage2.params                 = params
       stage2.params[:jobs_indices]  = job_index
-      stage2.params[:stage]         = 2
       stage2.params[:out_dir]       = stage1.params[:out_dir]
 
       stage2.share_workdir_with(stage1)
@@ -137,7 +135,6 @@ class CbrainTask::SparkHandler < PortalTask
     stage3.tool_config_id   = stage3_tc_id
     stage3.status           = 'New'
     stage3.params           = params
-    stage3.params[:stage3]  = 3
 
     stage3.share_workdir_with(stage2)
 
