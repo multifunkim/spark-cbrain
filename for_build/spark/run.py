@@ -24,7 +24,7 @@ def run_pipe(iargs):
 
     jobs_patterns = ''
     if iargs['jobs_indices']:
-        jobs_patterns = ';'.join([str(x) for x in iargs['jobs_indices']]) + ';'
+        jobs_patterns = quote(';'.join([str(x) for x in iargs['jobs_indices']]) + ';')
     if iargs['jobs_patterns']:
         jobs_patterns = ' '.join([quote(s) for s in iargs['jobs_patterns']])
 
