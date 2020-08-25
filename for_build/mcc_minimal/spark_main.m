@@ -201,7 +201,7 @@ end
 
 names = fieldnames(pipe);
 if endsWith(jobs_patterns, ';')
-    names = names(str2num(jobs_patterns)); %#ok
+    names = names(str2num(jobs_patterns{1})); %#ok
 else
     names(~contains(names, jobs_patterns)) = [];
 end
