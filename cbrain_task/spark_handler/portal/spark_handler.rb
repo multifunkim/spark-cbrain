@@ -40,113 +40,143 @@ class CbrainTask::SparkHandler < PortalTask
   def final_task_list #:nodoc:
     task_list = []
 
-    # Create stage 1 task
-    stage1_task  = self.create_stage1_task
-    task_list << stage1_task
+    # Create stage 1 tasks
+    stage1_tasks         = self.create_stage1_tasks
 
-    # # Create stage 2 tasks
-    stage2_tasks = self.create_stage2_tasks(stage1_task) 
-    task_list << stage2_tasks
+    # Create stage 2 tasks
+    grouped_stage2_tasks = self.create_stage2_tasks(stage1_tasks) 
 
     # Create stage 3 task
-    stage3_task  = self.create_stage3_task(stage2_tasks)
-    task_list << stage3_task
+    stage3_tasks         = self.create_stage3_tasks(grouped_stage2_tasks)
 
-    return task_list.flatten
+    return (stage1_tasks + grouped_stage2_tasks + stage3_tasks).flatten
   end
 
-  def create_stage1_task #:nodoc:
-    stage1 = CbrainTask::SPARKstage1of3.new
-    stage1.user_id          = self.user_id
-    stage1.bourreau_id      = self.bourreau_id
-    stage1.group_id         = self.group_id
-    stage1.tool_config_id   = self.tool_config_id
-    stage1.status           = 'New'
-    stage1.params           = params
-    stage1.params[:out_dir] = params[:out_dir] + self.run_id
+  def create_stage1_tasks #:nodoc:
 
-    stage1.save!
-    return stage1
+    # Grab all the cbcsv input files
+    cbcsvs       = self.cbcsv_files
+    stage1_tasks = []
+    # If one or more cbcsv files is present, generate a task for each entry
+    # Note they should have been validated in after_form
+    if (cbcsvs || []).length > 0
+      # Array with the actual userfiles corresponding to the cbcsv
+      mapCbcsvToUserfiles = cbcsvs.map { |f| f[1].ordered_raw_ids.map { |i| (i==0) ? nil : i } }
+      # Task list to fill and total number of tasks to output
+      tasklist, nTasks = [], mapCbcsvToUserfiles[0].length
+      # Iterate over each task that needs to be generated
+      for i in 0..(nTasks - 1)
+        # Clone this task
+        currTask = self.dup
+        # Replace each cbcsv with an entry
+        cbcsvs.map{ |f| f[0] }.each_with_index do |id,j|
+          currId = mapCbcsvToUserfiles[j][i]
+          #currTask.params[:interface_userfile_ids] << mapCbcsvToUserfiles unless currId.nil?
+          currTask.params[id] = currId # If id = 0 or nil, currId = nil
+          currTask.params.delete(id) if currId.nil?
+        end
+        # Add the new task to our tasklist
+        currTask.save!
+        currTask.params[:out_dir] = currTask.params[:out_dir] + "-#{currTask.id}" + currTask.run_id
+        currTask.save!
+        stage1_tasks << currTask
+      end
+    # Default case: just return self as a single task
+    else
+      self.params[:out_dir] = self.params[:out_dir] + "-#{self.id}" + self.run_id
+      self.save!
+      stage1_tasks << self
+    end
+    return stage1_tasks
   end
 
-  def create_stage2_tasks(stage1) #:nodoc:
-    stage2_tasks = []
+  def create_stage2_tasks(stage1_tasks) #:nodoc:
+    grouped_stage2_tasks = []
 
-    nb_resamplings = params[:nb_resamplings]
-    
     stage2_tool_id = Tool.where(:cbrain_task_class_name => CbrainTask::SPARKstage2of3).first.id
     if !stage2_tool_id
       self.addlog "No tool for Spark stage 2 found."
-      return []
+      return grouped_stage2_tasks
     end
 
     stage2_tc_id   = ToolConfig.where(:tool_id => stage2_tool_id, 
                                       :bourreau_id => self.bourreau_id).first.id
     if !stage2_tc_id
       self.addlog "Not tool config for Spark stage 2 found."
-      return []
+      return grouped_stage2_tasks
     end
 
-    for job_index in (1..nb_resamplings) do
-      stage2 = CbrainTask::SPARKstage2of3.new
-      stage2.user_id          = self.user_id
-      stage2.bourreau_id      = self.bourreau_id
-      stage2.group_id         = self.group_id
-      stage2.tool_config_id   = stage2_tc_id
-      stage2.status           = 'New'
+    stage1_tasks.each do |stage1_task|
+      nb_resamplings = stage1_task.params[:nb_resamplings]
 
-      # Change params.
-      stage2.params                 = params
-      stage2.params[:jobs_indices]  = job_index
-      stage2.params[:out_dir]       = stage1.params[:out_dir]
-
-      stage2.share_workdir_with(stage1)
-      stage2.add_prerequisites_for_setup(stage1.id, 'Completed')
+      stage2_tasks   = []
       
-      stage2.save!
+      for job_index in (1..nb_resamplings) do
+        stage2_task                = CbrainTask::SPARKstage2of3.new
+        stage2_task.user_id        = stage1_task.user_id
+        stage2_task.bourreau_id    = stage1_task.bourreau_id
+        stage2_task.group_id       = stage1_task.group_id
+        stage2_task.tool_config_id = stage2_tc_id
+        stage2_task.status         = 'New'
 
-      stage2_tasks << stage2
+        # Change params.
+        stage2_task.params                = params
+        stage2_task.params[:jobs_indices] = job_index
+        stage2_task.params[:out_dir]      = stage1_task.params[:out_dir]
+
+        stage2_task.share_workdir_with(stage1_task)
+        stage2_task.add_prerequisites_for_setup(stage1_task.id, 'Completed')
+        
+        stage2_task.save!
+
+        stage2_tasks << stage2_task
+      end
+
+      grouped_stage2_tasks << stage2_tasks 
     end
     
-    return stage2_tasks
+    return grouped_stage2_tasks
   end
 
-  def create_stage3_task(stage2_tasks) #:nodoc:
-    stage2 = stage2_tasks.first
-    stage3 = CbrainTask::SPARKstage3of3.new
+  def create_stage3_tasks(grouped_stage2_tasks) #:nodoc:
+    stage3_tasks = []
 
     stage3_tool_id = Tool.where(:cbrain_task_class_name => CbrainTask::SPARKstage3of3).first.id
     if !stage3_tool_id
       self.addlog "No tool for Spark stage 3 found."
-      return []
+      return stage3_tasks
     end
 
     stage3_tc_id   = ToolConfig.where(:tool_id => stage3_tool_id, 
                                       :bourreau_id => self.bourreau_id).first.id
     if !stage3_tc_id
       self.addlog "Not tool config for Spark stage 3 found."
-      return []
+      return stage3_tasks
     end
 
-    stage3 = CbrainTask::SPARKstage3of3.new
-    stage3.user_id          = self.user_id
-    stage3.bourreau_id      = self.bourreau_id
-    stage3.group_id         = self.group_id
-    stage3.tool_config_id   = stage3_tc_id
-    stage3.status           = 'New'
-    stage3.params           = params
+    grouped_stage2_tasks.each do |stage2_tasks| 
+      stage2_task                = stage2_tasks.first
+      stage3_task                = CbrainTask::SPARKstage3of3.new
+      stage3_task.user_id        = stage2_task.user_id
+      stage3_task.bourreau_id    = stage2_task.bourreau_id
+      stage3_task.group_id       = stage2_task.group_id
+      stage3_task.tool_config_id = stage3_tc_id
+      stage3_task.status         = 'New'
+      stage3_task.params         = params
 
-    stage3.share_workdir_with(stage2)
+      stage3_task.share_workdir_with(stage2_task)
 
-    # Add prerequisiteS to stage 2
-    stage2_tasks.each do |stage2_task|
-      stage3.params[:out_dir] = stage2_task.params[:out_dir]
-      stage3.add_prerequisites_for_setup(stage2.id, 'Completed')
+      # Add prerequisiteS to stage 2
+      stage2_tasks.each do |stage2_task|
+        stage3_task.params[:out_dir] = stage2_task.params[:out_dir]
+        stage3_task.add_prerequisites_for_setup(stage2_task.id, 'Completed')
+      end
+
+      stage3_task.save!
+      stage3_tasks << stage3_task
     end
 
-    stage3.save!
-
-    return stage3
+    return stage3_tasks
   end
 
 end
