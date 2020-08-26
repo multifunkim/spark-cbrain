@@ -123,7 +123,6 @@ class CbrainTask::SparkHandler < PortalTask
         stage2_task.params                = params
         stage2_task.params[:jobs_indices] = job_index
         stage2_task.params[:fmri]         = stage1_task.params[:fmri]
-        stage2_task.params[:mask]         = stage1_task.params[:mask]
         stage2_task.params[:out_dir]      = stage1_task.params[:out_dir]
 
         stage2_task.share_workdir_with(stage1_task)
@@ -166,7 +165,6 @@ class CbrainTask::SparkHandler < PortalTask
       stage3_task.status         = 'New'
       stage3_task.params         = params
       stage3_task.params[:fmri]  = stage2_task.params[:fmri]
-      stage3_task.params[:mask]  = stage2_task.params[:mask]
 
 
       stage3_task.share_workdir_with(stage2_task)
