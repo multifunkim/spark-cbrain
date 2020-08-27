@@ -124,6 +124,7 @@ class CbrainTask::SparkHandler < PortalTask
         stage2_task.params[:jobs_indices] = job_index
         stage2_task.params[:fmri]         = stage1_task.params[:fmri]
         stage2_task.params[:out_dir]      = stage1_task.params[:out_dir]
+        stage2_task.params[:verbose]      = stage1_task.params[:verbose]
 
         stage2_task.share_workdir_with(stage1_task)
         stage2_task.add_prerequisites_for_setup(stage1_task.id, 'Completed')
@@ -163,15 +164,17 @@ class CbrainTask::SparkHandler < PortalTask
       stage3_task.group_id       = stage2_task.group_id
       stage3_task.tool_config_id = stage3_tc_id
       stage3_task.status         = 'New'
-      stage3_task.params         = params
-      stage3_task.params[:fmri]  = stage2_task.params[:fmri]
-
+      
+      # Change params.
+      stage3_task.params           = params
+      stage3_task.params[:fmri]    = stage2_task.params[:fmri]
+      stage3_task.params[:out_dir] = stage2_task.params[:out_dir]
+      stage3_task.params[:verbose] = stage2_task.params[:verbose]
 
       stage3_task.share_workdir_with(stage2_task)
 
       # Add prerequisiteS to stage 2
       stage2_tasks.each do |stage2_task|
-        stage3_task.params[:out_dir] = stage2_task.params[:out_dir]
         stage3_task.add_prerequisites_for_setup(stage2_task.id, 'Completed')
       end
 
