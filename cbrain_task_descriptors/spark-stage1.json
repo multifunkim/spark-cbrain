@@ -4,7 +4,8 @@
     "command-line": "spark --SETUP [FMRI] [OUT_DIR] [MASK] [NB_RESAMPLINGS] [NETWORK_SCALES] [NB_ITERATIONS] [P_VALUE] [RESAMPLING_METHOD] [BLOCK_WINDOW_LENGTH] [DICT_INIT_METHOD] [SPARSE_CODING_METHOD] [PRESERVE_DC_ATOM] [VERBOSE] && spark --RUN --stage A [FMRI] [OUT_DIR] [VERBOSE]",
     "container-image": {
         "image": "multifunkim/spark-matlab:cbrain-mcv97",
-        "type": "docker"
+        "index": "docker://",
+        "type": "singularity"
     },
     "description": "SParsity-based Analysis of Reliable K-hubness (SPARK) for brain fMRI functional connectivity",
     "groups": [
@@ -242,5 +243,5 @@
         "cbrain:inherits-from-class": "CbrainTask::SparkHandler"
     },
     "tool-version": "v1.2.2",
-    "doi": "10.5281/zenodo.3985275"
+    "doi": "10.5281/zenodo.4010734"
 }
