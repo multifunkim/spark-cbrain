@@ -83,7 +83,8 @@ class CbrainTask::SparkHandler < PortalTask
       end
     # Default case: just return self as a single task
     else
-      self.params[:out_dir] = self.params[:out_dir] + "-#{self.id}" + self.run_id
+      self.params[:out_dir]   = self.params[:out_dir] + "-#{self.id}" + self.run_id
+      self.params[:_cb_stage] = "1"
       self.save!
       stage1_tasks << self
     end
@@ -125,6 +126,8 @@ class CbrainTask::SparkHandler < PortalTask
         stage2_task.params[:fmri]         = stage1_task.params[:fmri]
         stage2_task.params[:out_dir]      = stage1_task.params[:out_dir]
         stage2_task.params[:verbose]      = stage1_task.params[:verbose]
+        stage2_task.params[:_cb_stage]    = "2"
+
 
         stage2_task.share_workdir_with(stage1_task)
         stage2_task.add_prerequisites_for_setup(stage1_task.id, 'Completed')
@@ -166,10 +169,11 @@ class CbrainTask::SparkHandler < PortalTask
       stage3_task.status         = 'New'
       
       # Change params.
-      stage3_task.params           = params
-      stage3_task.params[:fmri]    = stage2_task.params[:fmri]
-      stage3_task.params[:out_dir] = stage2_task.params[:out_dir]
-      stage3_task.params[:verbose] = stage2_task.params[:verbose]
+      stage3_task.params             = params
+      stage3_task.params[:fmri]      = stage2_task.params[:fmri]
+      stage3_task.params[:out_dir]   = stage2_task.params[:out_dir]
+      stage3_task.params[:verbose]   = stage2_task.params[:verbose]
+      stage3_task.params[:_cb_stage] = "3"
 
       stage3_task.share_workdir_with(stage2_task)
 

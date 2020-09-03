@@ -35,6 +35,34 @@ class CbrainTask::SparkHandler < ClusterTask
   # # See the CbrainTask Programmer Guide
   def save_results #:nodoc:
     params    = self.params
+
+    # No matter how many errors occur, we need to save as many output
+    # files as possible and carry the error state to the end.
+    succeeded = true
+
+    # Make sure SPARKstage[*]of3 completed successfully by checking its exit status
+    # in +exit_cluster_filename+.
+    if !File.exists?(exit_cluster_filename)
+      self.addlog("Missing exit status file #{exit_cluster_filename}")
+      succeeded = false
+    else # Check exit status file content is a number.
+      status_file_content = File.read(exit_cluster_filename).strip
+      if status_file_content.blank? || status_file_content !~ /\A^\d+\z/
+        self.addlog("Exit status file #{exit_cluster_filename} has unexpected content")
+        succeeded = false
+      else # Check exit status value
+        exit_status = status_file_content.to_i
+        unless SystemExit.new(exit_status).success?
+          self.addlog("Command failed, exit status #{exit_status}")
+          succeeded = false
+        end # content is success
+      end # content exists
+    end # file exists
+
+    return succeeded if succeeded == false
+    return true      if params[:_cb_stage] == "1" || params[:_cb_stage] == "2"
+
+
     fmri_data = Userfile.find(params[:fmri])
 
     # DP for destination files
@@ -60,6 +88,10 @@ class CbrainTask::SparkHandler < ClusterTask
     self.save
 
     return true
+  end
+
+  def exit_cluster_filename
+    ".qsub.exit.#{self.name}.#{self.run_id}"
   end
 
 end
