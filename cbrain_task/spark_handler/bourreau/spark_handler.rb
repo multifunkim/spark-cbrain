@@ -43,23 +43,27 @@ class CbrainTask::SparkHandler < ClusterTask
       return false
     end
 
+    # Check status file
     status_file_content = File.read(exit_cluster_filename).strip
     if status_file_content.blank? || status_file_content !~ /\A^\d+\z/
       self.addlog("Exit status file #{exit_cluster_filename} has unexpected content")
       return false
-    else # Check exit status value
-      exit_status = status_file_content.to_i
-      unless SystemExit.new(exit_status).success?
-        self.addlog("Command failed, exit status #{exit_status}")
-        return false
-      end # content is success
-    end # content exists
-
-    if params[:_cb_stage] == "1" || params[:_cb_stage] == "2"
-      self.addlog("No need to save results for stage #{params[:_cb_stage]} of Spark")
-      return true
     end
 
+    # Check exit status value
+    exit_status = status_file_content.to_i
+    unless SystemExit.new(exit_status).success?
+      self.addlog("Command failed, exit status #{exit_status}")
+      return false
+    end # content is success
+
+    # Do not save file for stage 1 and 2 
+    if params[:_cb_stage] == "1" || params[:_cb_stage] == "2"
+      self.addlog("No need to save results for stage #{params[:_cb_stage]} of Spark")
+      return true 
+    end
+
+    # Save the result
     fmri_data = Userfile.find(params[:fmri])
 
     # DP for destination files
@@ -88,4 +92,3 @@ class CbrainTask::SparkHandler < ClusterTask
   end
 
 end
-
