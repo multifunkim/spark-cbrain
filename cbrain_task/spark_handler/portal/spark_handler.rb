@@ -78,7 +78,7 @@ class CbrainTask::SparkHandler < PortalTask
         # Add the new task to our tasklist
         currTask.save!
         currTask.params[:out_dir]   = currTask.params[:out_dir] + "-#{currTask.id}" + currTask.run_id
-	      currTask.params[:_cb_stage] = "1"
+        currTask.params[:_cb_stage] = "1"
         currTask.save!
         stage1_tasks << currTask
       end
