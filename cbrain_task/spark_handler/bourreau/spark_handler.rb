@@ -87,9 +87,5 @@ class CbrainTask::SparkHandler < ClusterTask
     return true
   end
 
-  def exit_cluster_filename
-    ".qsub.exit.#{self.name}.#{self.run_id}"
-  end
-
 end
 
